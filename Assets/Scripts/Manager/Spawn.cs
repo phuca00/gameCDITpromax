@@ -4,7 +4,8 @@ public class Spawn : MonoBehaviour
 {
     public Transform spawnPoint;
     public GameObject[] playerPrefabs;
-
+    public HealthBarController healthBarController;
+    
     void Start()
     {
         // Lấy index lưu từ Select Scene
@@ -14,6 +15,7 @@ public class Spawn : MonoBehaviour
         selectedPlayer = Mathf.Clamp(selectedPlayer, 0, playerPrefabs.Length - 1);
 
         // Spawn player
-        Instantiate(playerPrefabs[selectedPlayer], spawnPoint.position, Quaternion.identity);
+        var player= Instantiate(playerPrefabs[selectedPlayer], spawnPoint.position, Quaternion.identity);
+        healthBarController.SetPlayerHealth(player.GetComponent<PlayerHealth>());
     }
 }

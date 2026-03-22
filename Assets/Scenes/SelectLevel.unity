@@ -277,7 +277,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -447, y: -61.000004}
+  m_AnchoredPosition: {x: -310, y: -61}
   m_SizeDelta: {x: 144, y: 144}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &22797149
@@ -495,7 +495,7 @@ GameObject:
   - component: {fileID: 34589452}
   - component: {fileID: 34589451}
   m_Layer: 5
-  m_Name: 8
+  m_Name: 7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -567,7 +567,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1220115173}
         m_TargetAssemblyTypeName: ManagerLevel, Assembly-CSharp
-        m_MethodName: Level8
+        m_MethodName: Level7
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -837,9 +837,9 @@ RectTransform:
   - {fileID: 1606847762}
   - {fileID: 1855443875}
   - {fileID: 1277264137}
-  - {fileID: 1735995809}
   - {fileID: 1624192619}
   - {fileID: 34589450}
+  - {fileID: 1735995809}
   - {fileID: 22797148}
   - {fileID: 359398174}
   - {fileID: 109706661}
@@ -1874,7 +1874,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -757.922, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &458417730
@@ -1910,7 +1910,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 6
+  m_Text: 8
 --- !u!222 &458417731
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10590,7 +10590,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 7
+  m_Text: 6
 --- !u!222 &1058124755
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -11142,7 +11142,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 8
+  m_Text: 7
 --- !u!222 &1215721996
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -16253,7 +16253,7 @@ GameObject:
   - component: {fileID: 1624192621}
   - component: {fileID: 1624192620}
   m_Layer: 5
-  m_Name: 7
+  m_Name: 6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16325,7 +16325,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1220115173}
         m_TargetAssemblyTypeName: ManagerLevel, Assembly-CSharp
-        m_MethodName: Level7
+        m_MethodName: Level6
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16506,7 +16506,7 @@ GameObject:
   - component: {fileID: 1735995811}
   - component: {fileID: 1735995810}
   m_Layer: 5
-  m_Name: 6
+  m_Name: 8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16529,7 +16529,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -310, y: -61.000004}
+  m_AnchoredPosition: {x: -449.99997, y: -61}
   m_SizeDelta: {x: 144, y: 144}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1735995810
@@ -16578,7 +16578,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1220115173}
         m_TargetAssemblyTypeName: ManagerLevel, Assembly-CSharp
-        m_MethodName: Level6
+        m_MethodName: Level8
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

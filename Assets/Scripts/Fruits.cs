@@ -5,14 +5,23 @@ using UnityEngine;
 public class Fruits : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
         {
-            if (collision.CompareTag("Player"))
+            // Phát âm thanh
+            if (AudioManager.instance != null)
             {
-                // khi ăn fruit
                 AudioManager.instance.PlayFruit();
-
-                // Ẩn fruit 
-                gameObject.SetActive(false);
             }
+
+            // Cộng điểm
+            if (Score.instance != null)
+            {
+                Score.instance.AddScore(1);
+            }
+
+            // Ẩn fruit
+            gameObject.SetActive(false);
         }
+    }
 }
