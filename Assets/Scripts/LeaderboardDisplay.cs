@@ -13,7 +13,7 @@ public class LeaderboardDisplay : MonoBehaviour
         string lastScene = PlayerPrefs.GetString("LastScene", "level1");
         int score = PlayerPrefs.GetInt(lastScene + "_Score", 0);
 
-        scoreText.text = lastScene + "\nScore: " + score;
+        scoreText.text = SessionScore.totalScore.ToString();
 
         StartCoroutine(LoadNextLevel(lastScene));
     }

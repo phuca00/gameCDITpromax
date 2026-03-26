@@ -5,12 +5,16 @@ using System.Collections;
 
 public class CountdownTimer : MonoBehaviour
 {
+    [Header("UI")]
     [SerializeField] private TextMeshProUGUI timeText;
-    [SerializeField] private float startTime = 60f;
+
+    [Header("Time Settings")]
+    [SerializeField] private float startTime = 20f;
     [SerializeField] private float transitionDelay = 1f;
 
     private float currentTime;
     private bool isRunning = true;
+    private bool hasEnded = false; // tránh gọi EndGame nhiều lần
 
     private void Start()
     {
@@ -20,7 +24,7 @@ public class CountdownTimer : MonoBehaviour
 
     private void Update()
     {
-        if (!isRunning) return;
+        if (!isRunning || hasEnded) return;
 
         currentTime -= Time.deltaTime;
 
@@ -28,6 +32,8 @@ public class CountdownTimer : MonoBehaviour
         {
             currentTime = 0f;
             isRunning = false;
+            hasEnded = true;
+
             StartCoroutine(EndGame());
         }
 
@@ -42,17 +48,34 @@ public class CountdownTimer : MonoBehaviour
 
     IEnumerator EndGame()
     {
-        // LẤY ĐIỂM TỪ SCORE
-        int finalScore = Score.instance.GetScore();
+        // 🔥 Lấy điểm từ hệ thống Score
+        int finalScore = 0;
 
+        if (Score.instance != null)
+        {
+            finalScore = Score.instance.GetScore();
+        }
+        else
+        {
+            Debug.LogWarning("Score.instance is NULL!");
+        }
+
+        // 🔥 Lấy tên scene hiện tại
         string sceneName = SceneManager.GetActiveScene().name;
 
-        // LƯU SCENE + ĐIỂM
+        // 🔥 Lưu scene vừa chơi
         PlayerPrefs.SetString("LastScene", sceneName);
-        PlayerPrefs.SetInt(sceneName + "_Score", finalScore);
+
+        // 🔥 Cộng dồn điểm (SESSION - reset khi tắt game)
+        SessionScore.totalScore += finalScore;
+
+        Debug.Log("Scene: " + sceneName);
+        Debug.Log("Score màn: " + finalScore);
+        Debug.Log("Tổng session: " + SessionScore.totalScore);
 
         yield return new WaitForSeconds(transitionDelay);
 
+        // 🔥 Chuyển sang Leaderboard
         SceneManager.LoadScene("Leaderboard");
     }
 }
