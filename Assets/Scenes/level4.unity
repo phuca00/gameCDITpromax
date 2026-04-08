@@ -599,8 +599,37 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4790278984901805265, guid: ecd18b6195bf0524c8afc02982f81f60, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 154070556}
   m_SourcePrefab: {fileID: 100100000, guid: ecd18b6195bf0524c8afc02982f81f60, type: 3}
+--- !u!1 &154070555 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4790278984901805265, guid: ecd18b6195bf0524c8afc02982f81f60, type: 3}
+  m_PrefabInstance: {fileID: 154070554}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &154070556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154070555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3827645700
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1001 &180929571
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -609,6 +638,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1943633338}
     m_Modifications:
+    - target: {fileID: -2339462916714022502, guid: e866b039a3caa8e42a81fd849ec4968a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3750324403
+      objectReference: {fileID: 0}
     - target: {fileID: 1358192621419957251, guid: e866b039a3caa8e42a81fd849ec4968a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -690,6 +723,10 @@ PrefabInstance:
     - target: {fileID: 3143217763458194374, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
       propertyPath: m_Name
       value: Apple_0 (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4181404664865025567, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1392508736
       objectReference: {fileID: 0}
     - target: {fileID: 8250717274475623854, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
       propertyPath: m_LocalScale.x
@@ -1513,6 +1550,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1943633338}
     m_Modifications:
+    - target: {fileID: -6402712180296019406, guid: f7edb716989046849a2f6e518caf9025, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3221377658
+      objectReference: {fileID: 0}
     - target: {fileID: 3623631085564391477, guid: f7edb716989046849a2f6e518caf9025, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -1621,6 +1662,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apple_0 (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 4181404664865025567, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1532552587
+      objectReference: {fileID: 0}
     - target: {fileID: 8250717274475623854, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -1693,6 +1738,10 @@ PrefabInstance:
     - target: {fileID: 3143217763458194374, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
       propertyPath: m_Name
       value: Apple_0 (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4181404664865025567, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1134130655
       objectReference: {fileID: 0}
     - target: {fileID: 8250717274475623854, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
       propertyPath: m_LocalScale.x
@@ -1962,6 +2011,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apple_0 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 4181404664865025567, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 300482718
+      objectReference: {fileID: 0}
     - target: {fileID: 8250717274475623854, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -2154,6 +2207,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1943633338}
     m_Modifications:
+    - target: {fileID: -2339462916714022502, guid: e866b039a3caa8e42a81fd849ec4968a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 239838288
+      objectReference: {fileID: 0}
     - target: {fileID: 1358192621419957251, guid: e866b039a3caa8e42a81fd849ec4968a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -2560,6 +2617,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1943633338}
     m_Modifications:
+    - target: {fileID: -6402712180296019406, guid: f7edb716989046849a2f6e518caf9025, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3408109517
+      objectReference: {fileID: 0}
     - target: {fileID: 3623631085564391477, guid: f7edb716989046849a2f6e518caf9025, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -2761,6 +2822,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apple_0 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4181404664865025567, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2526885493
+      objectReference: {fileID: 0}
     - target: {fileID: 8250717274475623854, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -2908,6 +2973,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1943633338}
     m_Modifications:
+    - target: {fileID: -6402712180296019406, guid: f7edb716989046849a2f6e518caf9025, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2490823289
+      objectReference: {fileID: 0}
     - target: {fileID: 3623631085564391477, guid: f7edb716989046849a2f6e518caf9025, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -9250,6 +9319,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apple_0 (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 4181404664865025567, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 4002995416
+      objectReference: {fileID: 0}
     - target: {fileID: 8250717274475623854, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -9355,6 +9428,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1943633338}
     m_Modifications:
+    - target: {fileID: -2339462916714022502, guid: e866b039a3caa8e42a81fd849ec4968a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3135999165
+      objectReference: {fileID: 0}
     - target: {fileID: 1358192621419957251, guid: e866b039a3caa8e42a81fd849ec4968a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -9772,6 +9849,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1943633338}
     m_Modifications:
+    - target: {fileID: -2339462916714022502, guid: e866b039a3caa8e42a81fd849ec4968a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3846248909
+      objectReference: {fileID: 0}
     - target: {fileID: 1358192621419957251, guid: e866b039a3caa8e42a81fd849ec4968a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -12880,6 +12961,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1943633338}
     m_Modifications:
+    - target: {fileID: -6402712180296019406, guid: f7edb716989046849a2f6e518caf9025, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2153355223
+      objectReference: {fileID: 0}
     - target: {fileID: 3623631085564391477, guid: f7edb716989046849a2f6e518caf9025, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -13143,6 +13228,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apple_0 (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 4181404664865025567, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1470967989
+      objectReference: {fileID: 0}
     - target: {fileID: 8250717274475623854, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -13212,6 +13301,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1943633338}
     m_Modifications:
+    - target: {fileID: -6402712180296019406, guid: f7edb716989046849a2f6e518caf9025, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3819238820
+      objectReference: {fileID: 0}
     - target: {fileID: 3623631085564391477, guid: f7edb716989046849a2f6e518caf9025, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -13828,6 +13921,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apple_0
       objectReference: {fileID: 0}
+    - target: {fileID: 4181404664865025567, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 720557632
+      objectReference: {fileID: 0}
     - target: {fileID: 8250717274475623854, guid: a92fa09c80822ae4292a06847017c62a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3
@@ -13990,6 +14087,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1943633338}
     m_Modifications:
+    - target: {fileID: -2339462916714022502, guid: e866b039a3caa8e42a81fd849ec4968a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3666929297
+      objectReference: {fileID: 0}
     - target: {fileID: 1358192621419957251, guid: e866b039a3caa8e42a81fd849ec4968a, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.3

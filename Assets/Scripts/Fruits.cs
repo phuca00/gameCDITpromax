@@ -3,44 +3,45 @@ using Unity.Netcode;
 
 public class Fruits : NetworkBehaviour
 {
-    [SerializeField] private int scoreValue = 1;
+    [SerializeField] private int scoreValue = 10;
 
     private bool isCollected = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // chỉ server xử lý
-        if (!IsServer) return;
-
-        // tránh ăn 2 lần khi nhiều player chạm cùng lúc
+        if (!collision.CompareTag("Player")) return;
         if (isCollected) return;
 
-        if (!collision.CompareTag("Player")) return;
+        CollectServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void CollectServerRpc()
+    {
+        if (isCollected) return;
 
         isCollected = true;
 
-        // cộng điểm
-        if (ScoreManager.Instance != null)
+        // 🔥 GỬI điểm về client
+        AddScoreClientRpc(scoreValue);
+
+        // báo spawn lại
+        SpawnItem spawner = FindObjectOfType<SpawnItem>();
+        if (spawner != null)
         {
-            ScoreManager.Instance.AddScore(scoreValue);
+            spawner.ItemCollected();
         }
 
-        // gọi hiệu ứng cho tất cả client (nếu có)
-        PlayCollectEffectClientRpc();
-
-        // xoá object trên toàn network
-        NetworkObject.Despawn(true);
+        // xoá fruit
+        GetComponent<NetworkObject>().Despawn(true);
     }
 
     [ClientRpc]
-    void PlayCollectEffectClientRpc()
+    void AddScoreClientRpc(int value)
     {
-        // bạn có thể thêm:
-        // - sound
-        // - particle effect
-        // - floating text
-
-        // ví dụ:
-        // AudioManager.instance.PlayFruit();
+        if (Score.instance != null)
+        {
+            Score.instance.AddScore(value);
+        }
     }
 }

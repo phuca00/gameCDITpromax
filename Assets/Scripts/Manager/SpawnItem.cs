@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class SpawnItem : MonoBehaviour
 {
@@ -11,11 +12,10 @@ public class SpawnItem : MonoBehaviour
     public float spawnDelay = 2f;
 
     private List<Transform> spawnPoints = new List<Transform>();
-    private GameObject currentItem;
+    private NetworkObject currentItem;
 
     void Awake()
     {
-        // Lấy tất cả các Point con của SpawnItem
         foreach (Transform child in transform)
         {
             spawnPoints.Add(child);
@@ -24,7 +24,18 @@ public class SpawnItem : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(SpawnLoop());
+        if (NetworkManager.Singleton == null)
+        {
+            Debug.LogError("Không có NetworkManager!");
+            return;
+        }
+
+        // 🔥 CHỈ SERVER spawn
+        if (NetworkManager.Singleton.IsServer)
+        {
+            Debug.Log("Server bắt đầu spawn fruit");
+            StartCoroutine(SpawnLoop());
+        }
     }
 
     IEnumerator SpawnLoop()
@@ -43,18 +54,34 @@ public class SpawnItem : MonoBehaviour
     void SpawnRandomItem()
     {
         if (spawnPoints.Count == 0 || itemPrefabs.Length == 0)
+        {
+            Debug.LogError("Thiếu spawnPoints hoặc itemPrefabs!");
             return;
+        }
 
-        int randomPoint = Random.Range(0, spawnPoints.Count);
-        int randomItem = Random.Range(0, itemPrefabs.Length);
+        Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
+        GameObject prefab = itemPrefabs[Random.Range(0, itemPrefabs.Length)];
 
-        Transform spawnPoint = spawnPoints[randomPoint];
+        if (prefab == null)
+        {
+            Debug.LogError("Prefab NULL!");
+            return;
+        }
 
-        currentItem = Instantiate(
-            itemPrefabs[randomItem],
-            spawnPoint.position,
-            Quaternion.identity
-        );
+        GameObject obj = Instantiate(prefab, spawnPoint.position, Quaternion.identity);
+
+        NetworkObject netObj = obj.GetComponent<NetworkObject>();
+        if (netObj == null)
+        {
+            Debug.LogError("Prefab thiếu NetworkObject!");
+            return;
+        }
+
+        netObj.Spawn();
+
+        currentItem = netObj;
+
+        Debug.Log("Spawn fruit: " + prefab.name);
     }
 
     public void ItemCollected()

@@ -1,46 +1,43 @@
 using UnityEngine;
 using Unity.Netcode;
 
-public class Spawn : NetworkBehaviour
+public class SpawnManager : NetworkBehaviour
 {
-    public Transform[] spawnPoints; // nhiều vị trí spawn
+    public Transform[] spawnPoints;
     public GameObject[] playerPrefabs;
-    public HealthBarController healthBarController;
 
     public override void OnNetworkSpawn()
     {
-        
-        // chỉ server spawn
-        Debug.Log("== Check object spawned");
+        if (!IsServer) return;
 
-        if (!IsHost) return;
+        Debug.Log("✅ SpawnManager started");
 
-        Debug.Log("== Check spawn player for client");
-        SpawnAllPlayers();
-    }
-
-    void SpawnAllPlayers()
-    {
+        // 1. Spawn cho những thằng đã connect trước đó
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            Debug.Log($"== Spawn for player: {clientId}");
             SpawnPlayer(clientId);
         }
+
+        // 2. Nghe thêm client mới
+        NetworkManager.Singleton.OnClientConnectedCallback += SpawnPlayer;
     }
 
     void SpawnPlayer(ulong clientId)
     {
-        // chọn prefab random
-        int randomIndex = Random.Range(0, playerPrefabs.Length);
+        Debug.Log("🔥 Spawn player: " + clientId);
 
-        // chọn vị trí spawn random
+        int index = PlayerPrefs.GetInt("SelectedPlayerIndex", 0);
+        if (index >= playerPrefabs.Length) index = 0;
+
         Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
 
-        GameObject player = Instantiate(playerPrefabs[randomIndex], spawnPoint.position, Quaternion.identity);
+        GameObject player = Instantiate(
+            playerPrefabs[index],
+            spawnPoint.position,
+            Quaternion.identity
+        );
 
-        NetworkObject netObj = player.GetComponent<NetworkObject>();
-
-        // spawn player cho client đó
-        netObj.SpawnAsPlayerObject(clientId, true);
+        player.GetComponent<NetworkObject>()
+            .SpawnAsPlayerObject(clientId, true);
     }
 }

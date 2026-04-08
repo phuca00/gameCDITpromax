@@ -9,69 +9,59 @@ public class PlayerMovement : NetworkBehaviour
     public float speed = 4f;
     public float jumpingPower = 8f;
 
-    [Header("Rigidbody & Checks")]
+    [Header("Refs")]
     public Rigidbody2D rb;
     public Transform groundCheck;
-    public LayerMask groundLayer;
     public Transform wallCheck;
+    public LayerMask groundLayer;
     public LayerMask wallLayer;
 
-    [Header("Ground Check Settings")]
+    [Header("Check Settings")]
     public float groundCheckRadius = 0.18f;
+    public float wallCheckRadius = 0.2f;
+
+    [Header("Jump Settings")]
     public float coyoteTime = 0.12f;
     public float jumpBufferTime = 0.12f;
 
-    private float coyoteTimeCounter = 0f;
-    private float jumpBufferCounter = 0f;
+    private float coyoteCounter;
+    private float jumpBufferCounter;
 
-    [Header("Jump Counters")]
-    private bool canDoubleJump = false;
-    private int wallJumpCount = 0;
-    public int maxWallJumps = 2;
+    private bool canDoubleJump;
 
-    [Header("Wall Sliding")]
-    private bool isWallSliding = false;
-    public float wallSlidingSpeed = 2f;
+    [Header("Wall")]
+    public float wallSlideSpeed = 2f;
+    private bool isWallSliding;
 
     [Header("Wall Jump")]
-    private bool isWallJumping = false;
-    public float wallJumpDirection;
-    public float wallJumpDuration = 0.2f;
     public Vector2 wallJumpPower = new Vector2(5f, 10f);
+    private bool isWallJumping;
 
     [Header("Animation")]
     public Animator animator;
     private static readonly int stateHash = Animator.StringToHash("state");
 
-    private enum State { idle, running, jumping, falling, doubleJump, wallSlide }
+    enum State { idle, run, jump, fall, wall }
 
-    private bool isGroundedCached = false;
-
-    // 🔥 NETCODE SYNC
+    // NETCODE
     private NetworkVariable<int> netState = new NetworkVariable<int>();
-    private NetworkVariable<float> netScaleX = new NetworkVariable<float>();
+    private NetworkVariable<float> netScale = new NetworkVariable<float>();
 
     private void Update()
     {
-        // 👉 PLAYER KHÁC → chỉ nhận data
+        Debug.Log($"---Check Isowner: {IsOwner}");
+        // 👉 CLIENT KHÁC
         if (!IsOwner)
         {
             animator.SetInteger(stateHash, netState.Value);
 
             Vector3 scale = transform.localScale;
-            scale.x = netScaleX.Value;
+            scale.x = netScale.Value;
             transform.localScale = scale;
-
             return;
         }
 
-        // 👉 PLAYER LOCAL
-        if (Pause.inputLocked)
-        {
-            horizontal = 0;
-            return;
-        }
-
+        // 👉 LOCAL PLAYER
         horizontal = Input.GetAxisRaw("Horizontal");
 
         if (Input.GetButtonDown("Jump"))
@@ -79,12 +69,9 @@ public class PlayerMovement : NetworkBehaviour
         else
             jumpBufferCounter -= Time.deltaTime;
 
-        if (Input.GetButtonUp("Jump") && rb.velocity.y > 0)
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.55f);
-
-        TryConsumeJumpBuffer();
-
-        WallSlide();
+        HandleJump();
+        Debug.Log("---HandleWallSlide---");
+        HandleWallSlide();
         Flip();
         UpdateAnimation();
     }
@@ -93,90 +80,98 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        CheckGround();
+        bool grounded = IsGrounded();
+
+        if (grounded)
+        {
+            coyoteCounter = coyoteTime;
+            canDoubleJump = true;
+        }
+        else
+        {
+            coyoteCounter -= Time.fixedDeltaTime;
+        }
 
         if (!isWallJumping)
+        {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
-
-        if (isGroundedCached)
-            coyoteTimeCounter = coyoteTime;
-        else
-            coyoteTimeCounter -= Time.fixedDeltaTime;
-    }
-
-    private void CheckGround()
-    {
-        bool grounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-
-        if (grounded && !isGroundedCached)
-        {
-            canDoubleJump = true;
-            wallJumpCount = 0;
-        }
-
-        isGroundedCached = grounded;
-    }
-
-    private bool IsGrounded()
-    {
-        return isGroundedCached || coyoteTimeCounter > 0f;
-    }
-
-    private bool IsWalled()
-    {
-        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
-    }
-
-    private void TryConsumeJumpBuffer()
-    {
-        if (jumpBufferCounter > 0f)
-        {
-            if (IsGrounded())
-            {
-                DoJump();
-                jumpBufferCounter = 0f;
-                return;
-            }
-
-            if (IsWalled() && wallJumpCount < maxWallJumps)
-            {
-                wallJumpCount++;
-                StartWallJump();
-                jumpBufferCounter = 0f;
-                return;
-            }
-
-            if (canDoubleJump && !IsGrounded())
-            {
-                canDoubleJump = false;
-                rb.velocity = new Vector2(rb.velocity.x, jumpingPower * 0.9f);
-                AudioManager.instance.PlayJump();
-                jumpBufferCounter = 0f;
-                return;
-            }
         }
     }
 
-    private void DoJump()
+    // ---------------- GROUND ----------------
+    bool IsGrounded()
     {
-        rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
-        AudioManager.instance.PlayJump();
-        coyoteTimeCounter = 0f;
+        return Physics2D.OverlapCircle(
+            groundCheck.position,
+            groundCheckRadius,
+            groundLayer
+        );
     }
 
-    private void WallSlide()
+    // ---------------- WALL ----------------
+    bool IsWalled()
     {
-        bool touchingWall = IsWalled();
-        bool pushingTowardsWall =
-            (horizontal > 0 && transform.localScale.x > 0 && touchingWall) ||
-            (horizontal < 0 && transform.localScale.x < 0 && touchingWall);
+        return Physics2D.OverlapCircle(
+            wallCheck.position,
+            wallCheckRadius,
+            wallLayer
+        );
+    }
 
-        if (touchingWall && !IsGrounded() && (Mathf.Abs(horizontal) > 0f || pushingTowardsWall))
+    // ---------------- JUMP ----------------
+    void HandleJump()
+    {
+        if (jumpBufferCounter <= 0) return;
+
+        // nhảy đất
+        if (coyoteCounter > 0)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
+            jumpBufferCounter = 0;
+            return;
+        }
+
+        // double jump
+        if (canDoubleJump)
+        {
+            canDoubleJump = false;
+            rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
+            jumpBufferCounter = 0;
+            return;
+        }
+
+        // wall jump
+        if (IsWalled() && !IsGrounded())
+        {
+            isWallJumping = true;
+
+            float dir = -transform.localScale.x;
+
+            rb.velocity = new Vector2(dir * wallJumpPower.x, wallJumpPower.y);
+
+            Invoke(nameof(StopWallJump), 0.2f);
+
+            jumpBufferCounter = 0;
+        }
+    }
+
+    void StopWallJump()
+    {
+        isWallJumping = false;
+    }
+
+    // ---------------- WALL SLIDE ----------------
+    void HandleWallSlide()
+    {
+        Debug.Log("---Check hanldewallslide---");
+        if (IsWalled() && !IsGrounded() && horizontal != 0)
         {
             isWallSliding = true;
 
-            rb.velocity = new Vector2(rb.velocity.x,
-                Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
+            rb.velocity = new Vector2(
+                rb.velocity.x,
+                Mathf.Clamp(rb.velocity.y, -wallSlideSpeed, float.MaxValue)
+            );
         }
         else
         {
@@ -184,34 +179,18 @@ public class PlayerMovement : NetworkBehaviour
         }
     }
 
-    private void StartWallJump()
+    // ---------------- FLIP ----------------
+    void Flip()
     {
-        isWallSliding = false;
-        isWallJumping = true;
+        if (horizontal > 0)
+            transform.localScale = new Vector3(1, 1, 1);
 
-        wallJumpDirection = -transform.localScale.x;
-
-        rb.velocity = new Vector2(wallJumpDirection * wallJumpPower.x, wallJumpPower.y);
-
-        transform.localScale = new Vector3(wallJumpDirection, 1, 1);
-
-        Invoke(nameof(StopWallJump), wallJumpDuration);
+        if (horizontal < 0)
+            transform.localScale = new Vector3(-1, 1, 1);
     }
 
-    private void StopWallJump()
-    {
-        isWallJumping = false;
-    }
-
-    private void Flip()
-    {
-        if (isWallJumping) return;
-
-        if (horizontal > 0) transform.localScale = new Vector3(1.4f, 1.4f, 1.4f);
-        if (horizontal < 0) transform.localScale = new Vector3(-1.4f, 1.4f, 1.4f);
-    }
-
-    private void UpdateAnimation()
+    // ---------------- ANIMATION ----------------
+    void UpdateAnimation()
     {
         if (!IsOwner) return;
 
@@ -219,30 +198,30 @@ public class PlayerMovement : NetworkBehaviour
 
         if (IsGrounded())
         {
-            state = Mathf.Abs(horizontal) > 0.1f ? State.running : State.idle;
-
-            animator.SetInteger(stateHash, (int)state);
-            SendAnimServerRpc((int)state, transform.localScale.x);
-            return;
+            state = horizontal == 0 ? State.idle : State.run;
+        }
+        else if (isWallSliding)
+        {
+            state = State.wall;
+        }
+        else if (rb.velocity.y > 0)
+        {
+            state = State.jump;
+        }
+        else
+        {
+            state = State.fall;
         }
 
-        if (isWallSliding)
-            state = State.wallSlide;
-        else if (rb.velocity.y > 0.1f)
-            state = canDoubleJump ? State.jumping : State.doubleJump;
-        else if (rb.velocity.y < -0.1f)
-            state = State.falling;
-        else
-            state = State.idle;
-
         animator.SetInteger(stateHash, (int)state);
+
         SendAnimServerRpc((int)state, transform.localScale.x);
     }
 
     [ServerRpc]
-    void SendAnimServerRpc(int state, float scaleX)
+    void SendAnimServerRpc(int state, float scale)
     {
         netState.Value = state;
-        netScaleX.Value = scaleX;
+        netScale.Value = scale;
     }
 }

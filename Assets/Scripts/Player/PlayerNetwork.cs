@@ -53,6 +53,7 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void Update()
     {
+        Debug.Log($"--- Check Isowner: {IsOwner}");
         // 👉 PLAYER KHÁC → chỉ nhận data
         if (!IsOwner)
         {
@@ -69,6 +70,7 @@ public class PlayerNetwork : NetworkBehaviour
         // 👉 PLAYER LOCAL
         if (Pause.inputLocked)
         {
+            Debug.Log($"Check inputLocked: {Pause.inputLocked}");
             horizontal = 0;
             return;
         }
@@ -125,7 +127,17 @@ public class PlayerNetwork : NetworkBehaviour
 
     private bool IsWalled()
     {
-        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
+        Collider2D hit = Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
+        if(hit != null)
+        {
+            Debug.Log("Wall detected: " + hit.name);
+            return true;
+        }
+        else
+        {
+            Debug.Log("No wall detected at: " + wallCheck.position);
+            return false;
+        }
     }
 
     private void TryConsumeJumpBuffer()
@@ -168,6 +180,7 @@ public class PlayerNetwork : NetworkBehaviour
     private void WallSlide()
     {
         bool touchingWall = IsWalled();
+        Debug.Log($"--- Check wall sliding: {IsWalled()}");
         bool pushingTowardsWall =
             (horizontal > 0 && transform.localScale.x > 0 && touchingWall) ||
             (horizontal < 0 && transform.localScale.x < 0 && touchingWall);

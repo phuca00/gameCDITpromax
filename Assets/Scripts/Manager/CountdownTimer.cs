@@ -6,38 +6,29 @@ using System.Collections;
 
 public class CountdownTimer : NetworkBehaviour
 {
-    [Header("UI")] [SerializeField] private TMP_Text timeText;
+    [Header("UI")]
+    [SerializeField] private TMP_Text timeText;
 
-    [Header("Time Settings")] [SerializeField]
-    private float startTime = 60f;
+    [Header("Time Settings")]
+    [SerializeField] private float startTime = 60f;
 
-    [Header("Delay")] [SerializeField] private float leaderboardTime = 2f;
+    [Header("Delay")]
+    [SerializeField] private float leaderboardTime = 2f;
 
     private NetworkVariable<float> currentTime = new NetworkVariable<float>();
     private bool hasEnded = false;
 
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        DontDestroyOnLoad(gameObject);
-    }
-
-    private void FindReferencesTimeText()
-    {
-        if (timeText == null) timeText = GameObject.Find("Time").GetComponent<TMP_Text>();
-    }
-
-public override void OnNetworkSpawn()
-    {
-        // 🔥 CHỈ HOST (server) set thời gian ban đầu
         if (IsServer)
         {
             currentTime.Value = startTime;
         }
     }
 
-    private void Update()
+    void Update()
     {
-        // 🔥 CHỈ SERVER đếm ngược
+        // 🔥 SERVER đếm ngược
         if (IsServer && !hasEnded)
         {
             currentTime.Value -= Time.deltaTime;
@@ -51,7 +42,6 @@ public override void OnNetworkSpawn()
             }
         }
 
-        // 🔥 TẤT CẢ CLIENT chỉ hiển thị
         UpdateUI();
     }
 
@@ -65,18 +55,28 @@ public override void OnNetworkSpawn()
 
     IEnumerator EndGameFlow()
     {
-        Debug.Log("Hết giờ - Server xử lý");
+        Debug.Log("Hết giờ!");
 
-        string currentScene = SceneManager.GetActiveScene().name;
+        // 🔥 LẤY ĐIỂM
+        int finalScore = 0;
+        if (Score.instance != null)
+        {
+            finalScore = Score.instance.GetScore();
+        }
 
-        // lưu lại level hiện tại
-        PlayerPrefs.SetString("LastLevel", currentScene);
+        // 🔥 LẤY SCENE HIỆN TẠI
+        string sceneName = SceneManager.GetActiveScene().name;
 
-        // 👉 CHỈ load leaderboard
+        // 🔥 LƯU ĐIỂM + LEVEL
+        PlayerPrefs.SetInt(sceneName + "_Score", finalScore);
+        PlayerPrefs.SetString("LastLevel", sceneName);
+        PlayerPrefs.Save();
+
+        Debug.Log("Saved Score: " + finalScore);
+
+        // 🔥 LOAD LEADERBOARD
         NetworkManager.Singleton.SceneManager.LoadScene("Leaderboard", LoadSceneMode.Single);
 
-        yield break; // 🔥 DỪNG tại đây
-    
-
+        yield return null;
     }
 }
