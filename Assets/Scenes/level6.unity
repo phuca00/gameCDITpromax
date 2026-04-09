@@ -6541,6 +6541,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SpawnManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2694601954719151505, guid: 83c63adf5c21fbf48b15b17c672cf905, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2847043059142239439, guid: 83c63adf5c21fbf48b15b17c672cf905, type: 3}
       propertyPath: healthBarController
       value: 

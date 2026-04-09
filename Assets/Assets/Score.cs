@@ -1,51 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using TMPro;
+using Unity.Netcode;
 
 public class Score : MonoBehaviour
 {
-    public static Score instance;
+    public TMP_Text myScoreText; 
 
-    public TMP_Text myScoreText;
-
-    private int scoreNum;
-
-    private void Awake()
+    void Update()
     {
-        // Singleton
-        if (instance == null)
+        if (myScoreText == null || NetworkManager.Singleton == null || !NetworkManager.Singleton.IsConnectedClient) return;
+
+        // Tìm nhân vật của chính mình (Local Player)
+        PlayerNetwork myPlayer = null;
+        if (NetworkManager.Singleton.LocalClient != null && NetworkManager.Singleton.LocalClient.PlayerObject != null)
         {
-            instance = this;
+            myPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerNetwork>();
         }
         else
         {
-            Destroy(gameObject);
+            // Quét dự phòng nếu LocalClient chưa cập nhật kịp
+            PlayerNetwork[] allPlayers = FindObjectsOfType<PlayerNetwork>();
+            foreach (var p in allPlayers)
+            {
+                if (p.IsOwner) myPlayer = p;
+            }
         }
-    }
 
-    void Start()
-    {
-        scoreNum = 0;
-        UpdateScore();
-    }
-
-    // Hàm cộng điểm
-    public void AddScore(int value)
-    {
-        scoreNum += value;
-        UpdateScore();
-    }
-
-    // LẤY ĐIỂM HIỆN TẠI
-    public int GetScore()
-    {
-        return scoreNum;
-    }
-
-    // Update UI
-    void UpdateScore()
-    {
-        myScoreText.text = "Score: " + scoreNum;
+        // Hiện điểm lên
+        if (myPlayer != null)
+        {
+            myScoreText.text = "Score: " + myPlayer.playerScore.Value;
+        }
     }
 }

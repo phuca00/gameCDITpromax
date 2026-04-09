@@ -59,61 +59,36 @@ public class CountdownTimer : NetworkBehaviour
 
     IEnumerator EndGameFlow()
     {
-        Debug.Log("--- HẾT GIỜ! ĐANG XỬ LÝ KẾT THÚC ---");
-
-        // 1. Lưu điểm cục bộ trên máy Host (Server)
-        int finalScore = 0;
-        if (Score.instance != null)
+        // 1. LƯU LẠI TÊN MÀN CHƠI ĐỂ BIẾT ĐƯỜNG MÀ SANG MÀN TIẾP THEO
+        if (IsServer)
         {
-            finalScore = Score.instance.GetScore();
+            string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            PlayerPrefs.SetString("LastLevel", currentScene);
+            PlayerPrefs.Save();
         }
 
-        string sceneName = SceneManager.GetActiveScene().name;
-        PlayerPrefs.SetInt(sceneName + "_Score", finalScore);
-        PlayerPrefs.SetString("LastLevel", sceneName);
-        PlayerPrefs.Save();
+        FreezeAndKeepPlayersClientRpc();
+        yield return new WaitForSeconds(1.0f); // Đợi mạng ổn định
 
-        Debug.Log("Saved Score: " + finalScore);
-
-        // 2. NGAY LẬP TỨC ĐÓNG BĂNG MỌI NGƯỜI CHƠI (Chống lỗi va chạm lúc đang load scene)
-        FreezeAllPlayersClientRpc();
-
-        // 3. Chờ 0.5s để chắc chắn điểm và gói tin cuối cùng được cập nhật
-        yield return new WaitForSeconds(0.5f);
-
-        // 4. SERVER ra lệnh cho toàn bộ Network chuyển sang Scene Leaderboard
-        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+        if (IsServer)
         {
-            var status = NetworkManager.Singleton.SceneManager.LoadScene("Leaderboard", LoadSceneMode.Single);
-
-            if (status != SceneEventProgressStatus.Started)
-            {
-                Debug.LogError($"Không thể chuyển Scene: {status}");
-            }
+            NetworkManager.Singleton.SceneManager.LoadScene("Leaderboard", UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
     }
 
-    // Hàm Rpc này bắt tất cả máy con phải khóa nhân vật lại, không cho chết hay chạy nhảy nữa
     [ClientRpc]
-    void FreezeAllPlayersClientRpc()
+    void FreezeAndKeepPlayersClientRpc()
     {
         PlayerNetwork[] players = FindObjectsOfType<PlayerNetwork>();
         foreach (var p in players)
         {
-            // Bứt ra khỏi mớ bòng bong của Scene
             p.transform.SetParent(null);
-
-            // --- BÙA HỘ MỆNH CHỐNG CHÉM NHẦM Ở ĐÂY ---
-            // Lệnh này giúp nhân vật không bị xóa khi Scene cũ biến mất,
-            // nó sẽ ngoan ngoãn chờ lệnh Despawn hợp lệ từ Server bay tới.
-            DontDestroyOnLoad(p.gameObject);
-
-            if (p.rb != null)
-            {
+            DontDestroyOnLoad(p.gameObject); // Phép màu giữ điểm số qua màn mới
+            
+            if (p.rb != null) {
                 p.rb.velocity = Vector2.zero;
                 p.rb.simulated = false;
             }
-
             p.enabled = false;
         }
     }

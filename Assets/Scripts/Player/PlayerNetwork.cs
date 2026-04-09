@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.SceneManagement;
 
 public class PlayerNetwork : NetworkBehaviour
 {
@@ -41,6 +42,9 @@ public class PlayerNetwork : NetworkBehaviour
     private NetworkVariable<int> netState = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     private NetworkVariable<float> netScaleX = new NetworkVariable<float>(1.4f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    [Header("Score System")]
+    public NetworkVariable<int> playerScore = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
     public override void OnNetworkSpawn()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -61,6 +65,15 @@ public class PlayerNetwork : NetworkBehaviour
             rb.velocity = Vector2.zero; 
             rb.interpolation = RigidbodyInterpolation2D.Interpolate; 
         }
+
+        // Đăng ký sự kiện: Cứ mỗi khi đổi màn hình, gọi hàm OnSceneChange
+        SceneManager.sceneLoaded += OnSceneChange;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        // Gỡ sự kiện khi nhân vật bị xóa để tránh lỗi bộ nhớ
+        SceneManager.sceneLoaded -= OnSceneChange;
     }
 
     private void Update()
@@ -72,13 +85,14 @@ public class PlayerNetwork : NetworkBehaviour
             return; 
         }
 
-        if (Pause.inputLocked) { horizontal = 0; return; }
+        // Nếu có script Pause làm khóa phím thì bỏ qua đoạn này nếu ông đang không dùng
+        // if (Pause.inputLocked) { horizontal = 0; return; }
         horizontal = Input.GetAxisRaw("Horizontal");
 
         if (IsGrounded()) 
         {
             coyoteTimeCounter = coyoteTime;
-            isDoingDoubleJump = false; // Chạm đất là chắc chắn ngắt nhảy đôi
+            isDoingDoubleJump = false; 
         }
         else 
         {
@@ -112,7 +126,7 @@ public class PlayerNetwork : NetworkBehaviour
                 jumpBufferCounter = 0f; 
                 canDoubleJump = false;
                 rb.velocity = new Vector2(rb.velocity.x, jumpingPower * 0.85f);
-                isDoingDoubleJump = true; // Kích hoạt nhảy đôi
+                isDoingDoubleJump = true; 
             }
         }
 
@@ -155,25 +169,23 @@ public class PlayerNetwork : NetworkBehaviour
         
         if (isWallSliding) 
         {
-            s = 5; // 5: Trượt tường
+            s = 5; 
         }
         else if (!IsGrounded()) 
         {
             if (isDoingDoubleJump) 
             {
-                s = 4; // 4: Nhảy đôi (Xoay tròn)
-                
-                // MẸO GAME FEEL: Bay đến điểm cao nhất, bắt đầu rơi thì ngắt trạng thái xoay!
+                s = 4; 
                 if (rb.velocity.y < 0f) isDoingDoubleJump = false;
             }
             else 
             {
-                s = rb.velocity.y > 0.1f ? 2 : 3; // 2: Nhảy thường, 3: Rơi
+                s = rb.velocity.y > 0.1f ? 2 : 3; 
             }
         }
         else 
         {
-            s = Mathf.Abs(horizontal) > 0.1f ? 1 : 0; // 1: Chạy, 0: Đứng
+            s = Mathf.Abs(horizontal) > 0.1f ? 1 : 0; 
         }
 
         animator.SetInteger(stateHash, s);
@@ -210,4 +222,54 @@ public class PlayerNetwork : NetworkBehaviour
 
     private bool IsGrounded() => Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
     private bool IsWalled() => Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
+
+    public void AddScore(int amount)
+    {
+        if (IsServer) playerScore.Value += amount;
+    }
+
+    // --- LOGIC TỰ ĐỘNG SANG MÀN MỚI ---
+    void OnSceneChange(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+    {
+        if (scene.name.ToLower().Contains("level"))
+        {
+            // 1. Mở khóa cho người chơi điều khiển lại
+            this.enabled = true;
+            if (rb != null) rb.simulated = true;
+
+            // 2. Tự động chia vị trí (Chỉ Server mới dịch chuyển)
+            if (IsServer)
+            {
+                int pointIndex = (int)OwnerClientId + 1; 
+                string targetPointName = "point" + pointIndex;
+
+                GameObject spawnPoint = GameObject.Find(targetPointName);
+                Vector3 newPosition = Vector3.zero;
+                
+                if (spawnPoint != null)
+                {
+                    newPosition = spawnPoint.transform.position;
+                    Debug.Log($"[Client {OwnerClientId}] Đang đáp xuống: {targetPointName}");
+                }
+                else
+                {
+                    // Lỗi kẹt tường hay do nó nhảy vào dòng Backup này (Tọa độ 0,0,0)
+                    GameObject backupPoint = GameObject.Find("point1");
+                    newPosition = (backupPoint != null) ? backupPoint.transform.position : Vector3.zero; 
+                    Debug.LogWarning($"[Client {OwnerClientId}] Không thấy {targetPointName}, vứt tạm vào point1");
+                }
+
+                // ÉP TRỤC Z = 0 (Sửa lỗi nhân vật bị kẹt ra sau background 2D)
+                newPosition.z = 0f;
+                transform.position = newPosition;
+
+                // BÓP PHANH QUÁN TÍNH: Xóa hết lực bay/rơi từ màn trước để không bị trôi xuyên tường
+                if (rb != null)
+                {
+                    rb.velocity = Vector2.zero;
+                    rb.angularVelocity = 0f;
+                }
+            }
+        }
+    }
 }

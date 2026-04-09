@@ -3,30 +3,22 @@ using Unity.Netcode;
 
 public class Fruits : NetworkBehaviour
 {
-    [SerializeField] private int scoreValue = 10;
+    public int scoreValue = 10;
     private bool isCollected = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // CHỈ SERVER mới có quyền xóa quả dâu và cộng điểm
-        if (!IsServer) return; 
+        if (!IsServer || isCollected) return; 
 
-        if (collision.CompareTag("Player") && !isCollected)
+        // Tự động quét xem vật chạm vào có phải là người chơi không
+        PlayerNetwork pn = collision.GetComponent<PlayerNetwork>();
+        if (pn != null)
         {
             isCollected = true;
-
-            // Cộng điểm vào ScoreManager (Server ghi vào NetworkVariable)
-            if (ScoreManager.Instance != null)
-            {
-                ScoreManager.Instance.AddScore(scoreValue);
-            }
-
-            // Xóa quả dâu trên toàn mạng bằng Despawn
-            var netObj = GetComponent<NetworkObject>();
-            if (netObj != null && netObj.IsSpawned)
-            {
-                netObj.Despawn(); 
-            }
+            pn.AddScore(scoreValue); 
+            
+            if (GetComponent<NetworkObject>().IsSpawned) 
+                GetComponent<NetworkObject>().Despawn(); 
         }
     }
 }
